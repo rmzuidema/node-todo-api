@@ -11,7 +11,8 @@ mongoose.Promise = global.Promise;
 var app = express();
 app.use(bodyParser.json());
 
-var PORT = 3000;
+const port = process.env.PORT || 3000;
+
 
 app.post('/todos', (req, res) => {
     console.log(req.body);
@@ -58,7 +59,7 @@ app.get('/todos/:id', (req,res) => {
     });
 });
 
-
+// tried using a then with error
 // app.get('/todos/:id', (req,res) => {
 //     //   res.send(req.params);
 //        var id = req.params.id;
@@ -80,8 +81,8 @@ app.get('/todos/:id', (req,res) => {
 //        });
 //    });
 
-app.listen(PORT||3000, () => {
-    console.log(`Server started in port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server started in port ${port}`);
 });
 
 module.exports = { app };
