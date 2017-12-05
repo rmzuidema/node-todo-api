@@ -4,8 +4,11 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 // Connect to database
 
-mongoose.connect('mongodb://todouser:todouser58@ds129966.mlab.com:29966/newtodoapp');
-//mongoose.connect('mongodb://localhost:27017/newtodoapp',{ useMongoClient: true});
+// Run in Mlab ==> remove comments from line below
+//mongoose.connect('mongodb://todouser:todouser58@ds129966.mlab.com:29966/newtodoapp');
+
+// Run local ==> remove comments from line below
+mongoose.connect('mongodb://localhost:27017/NewTodoApp',{ useMongoClient: true});
 
 module.exports = {
     mongoose: mongoose
