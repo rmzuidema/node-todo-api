@@ -114,8 +114,11 @@ app.delete('/todos/:id', (req,res) => {
     var body = _.pick(req.body, ["text", "completed"]);
 
     if (_.isBoolean(body.completed) && (body.completed)){
+        console.log("If -- body.completed", _.isBoolean(body.completed));
         body.completedAt = new Date().getTime();
+        body.completed = true;
     } else {
+        console.log("Else -- body.completed", _.isBoolean(body.completed));
         body.completed = false;
         body.completedAt = null;
     }
