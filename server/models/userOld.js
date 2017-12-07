@@ -1,10 +1,24 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const jwt = require('jsonwebtoken');
-const _ = require('lodash');
 
-// Creating a schema 
-var UserSchema = new mongoose.Schema({
+// Old way 
+// var User = mongoose.model('User', {
+//     email: {
+//         type: String,
+//         required: true,
+//         minlength: 1,
+//         trim: true,
+//         validate: {
+//             validator: (value)=> {
+//                 var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+//                 return re.test(value);
+//             }
+//         }
+//     }
+// });
+
+// new way
+var User = mongoose.model('User', {
     email: {
         type: String,
         required: true,
@@ -34,32 +48,5 @@ var UserSchema = new mongoose.Schema({
             }
         }]
 });
-
-// filter out some of the fields in the return object to the client
-UserSchema.methods.toJSON = function() {
-    var user = this;
-    // convert the user to a usable object
-    var userObject = user.toObject();
-
-    return _.pick( userObject, ['email', '_id']);
-
-};
-
-UserSchema.methods.generateAuthToken = function () {
-    var user = this;
-    var access = 'auth';
-    var token = jwt.sign({
-        _id: user._id.toHexString(),
-        access: access
-    }, 'saltSecret').toString();
-
-    user.tokens.push({access: access, token: token});
-
-};
-
-// new way
-var User = mongoose.model('User', UserSchema);
-
-
 
 module.exports = { User };

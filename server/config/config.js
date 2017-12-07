@@ -1,6 +1,6 @@
 // Created a local env variable called NODE_ENV and set to local
 
-var env = process.env.NODE_ENV;
+var env = process.env.NODE_ENV || 'Local';
 if ( env === 'Local') {
     process.env.MONGOURI='mongodb://localhost:27017/NewTodoApp';
 } else {

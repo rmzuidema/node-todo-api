@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000;
 
 
 app.post('/todos', (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     var todo = new Todo({
         text: req.body.text
     });
@@ -116,11 +116,11 @@ app.delete('/todos/:id', (req,res) => {
     var body = _.pick(req.body, ["text", "completed"]);
 
     if (_.isBoolean(body.completed) && (body.completed)){
-        console.log("If -- body.completed", _.isBoolean(body.completed));
+        //console.log("If -- body.completed", _.isBoolean(body.completed));
         body.completedAt = new Date().getTime();
         body.completed = true;
     } else {
-        console.log("Else -- body.completed", _.isBoolean(body.completed));
+        //console.log("Else -- body.completed", _.isBoolean(body.completed));
         body.completed = false;
         body.completedAt = null;
     }
@@ -135,6 +135,33 @@ app.delete('/todos/:id', (req,res) => {
         return res.status(400).send();
     });
 
+});
+
+
+app.post('/users', (req, res) => {
+    //console.log(req.body);
+    var body = _.pick(req.body, ["email", "password"]);
+    console.log(body);
+    
+    // Method below is easier
+    // var user = new User({
+    //     email: body.email,
+    //     password: body.password
+    // });
+  
+    var user = new User(body);
+    user.generateAuthToken();
+    console.log(user);
+
+    user.save().then(
+        (doc) => 
+        {
+          res.send(doc);
+        }, 
+        (error) => 
+        {
+            res.status(400).send(error);
+        });
 });
 
 app.listen(port, () => {
