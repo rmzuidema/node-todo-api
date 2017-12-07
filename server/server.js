@@ -8,6 +8,7 @@ var {mongoose} = require('./db/mongoose');
 const {ObjectID} = require('mongodb');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 mongoose.Promise = global.Promise;
 
@@ -141,7 +142,7 @@ app.delete('/todos/:id', (req,res) => {
 app.post('/users', (req, res) => {
     //console.log(req.body);
     var body = _.pick(req.body, ["email", "password"]);
-    console.log(body);
+    //console.log(body);
     
     // Method below is easier
     // var user = new User({
@@ -151,17 +152,26 @@ app.post('/users', (req, res) => {
   
     var user = new User(body);
     user.generateAuthToken();
-    console.log(user);
+    //console.log(user);
+    var token = _.find(user.tokens, { access: 'auth'}).token;
+    //var token = user.tokens[0].token;
+    //console.log('Token ', token);
 
     user.save().then(
         (doc) => 
         {
-          res.send(doc);
+          res.header('x-auth', token).send(doc);
         }, 
         (error) => 
         {
             res.status(400).send(error);
         });
+});
+
+
+
+app.post('/users/me', authenticate, (req, res) => {
+       res.send(req.user);
 });
 
 app.listen(port, () => {
