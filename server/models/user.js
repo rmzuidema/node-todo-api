@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 // Creating a schema 
 var UserSchema = new mongoose.Schema({
@@ -81,6 +82,29 @@ UserSchema.statics.findByToken = function(token){
         'tokens.access': 'auth'
         });
 };
+
+UserSchema.pre('save', function(next) {
+    // not sure why in this case the this is the instance and not the Schema
+    var user = this;
+    // existing method in the user -- provided by mongoose
+    if (user.isModified('password')) {
+        console.log('User is modified');
+        // must encrypt the password
+        bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(user.password, salt, function (err, hash) {
+                console.log('User is modified and hash = ', hash);
+                // Store hash in user and in the DB. 
+               user.password=hash;
+               next();
+            });
+        });
+        // this else is required here as the process is 
+        // async and the next can be called beore the value is set in the user
+    } else{
+        next();
+    };
+
+});
 
 // new way
 var User = mongoose.model('User', UserSchema);

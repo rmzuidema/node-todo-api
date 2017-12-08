@@ -168,7 +168,18 @@ app.post('/users', (req, res) => {
         });
 });
 
+// function auth( res, next) {
+//     console.log(req);
+// }
 
+// This works - funny
+// app.post('/users/me', 
+//     function(req, res, next){
+//     console.log(req);
+//     }, 
+//     function(req, res)  {
+//        res.send(req.user);
+// });
 
 app.post('/users/me', authenticate, (req, res) => {
        res.send(req.user);
