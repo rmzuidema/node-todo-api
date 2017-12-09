@@ -88,11 +88,11 @@ UserSchema.pre('save', function(next) {
     var user = this;
     // existing method in the user -- provided by mongoose
     if (user.isModified('password')) {
-        console.log('User is modified');
+        //console.log('User is modified');
         // must encrypt the password
         bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(user.password, salt, function (err, hash) {
-                console.log('User is modified and hash = ', hash);
+                //console.log('User is modified and hash = ', hash);
                 // Store hash in user and in the DB. 
                user.password=hash;
                next();

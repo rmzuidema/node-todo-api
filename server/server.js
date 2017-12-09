@@ -88,16 +88,16 @@ app.get('/todos/:id', (req,res) => {
 app.delete('/todos/:id', (req,res) => {
        var id = req.params.id;
        if (!ObjectID.isValid(id)) {
-           //console.log('In obj id failed');
+           console.log('In obj id failed', id);
            return res.status(404).send();
        }
        Todo.findByIdAndRemove(id).then( (todo) => {
            if(todo){
-               //console.log('In found');
+               console.log('In found');
                return res.send({todo: todo});
            }
            else {
-               //console.log('In not found');
+               console.log('In not found');
                return res.status(404).send({todos: todo});
            }
        }).catch( (error) => {
@@ -181,7 +181,7 @@ app.post('/users', (req, res) => {
 //        res.send(req.user);
 // });
 
-app.post('/users/me', authenticate, (req, res) => {
+app.get('/users/me', authenticate, (req, res) => {
        res.send(req.user);
 });
 
