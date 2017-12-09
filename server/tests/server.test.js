@@ -8,7 +8,7 @@ var {User} = require('./../models/user');
 var {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
 
-
+// Seems to work as before each describe these befor run...
 beforeEach(populateUsers);
 beforeEach(populateTodos);
 
@@ -115,48 +115,88 @@ it('should return 404 if todo not found', (done) => {
     });
  });
 
-// describe('DELETE /todos/:id', () => {
-//     it('should remove a todo', (done) => {
-//       var hexId = todos[1]._id.toHexString();
-  
-//       request(app)
-//         .delete(`/todos/${hexId}`)
-//         .expect(200)
-//         .expect( (res) => {
-//           expect(res.body.todo._id).toBe(hexId);
-//         })
-//         .end( (err, res) => {
-//           if (err) {
-//             return done(err);
-//           }
-  
-//           Todo.findById(hexId).then((todo) => {
-//             expect(todo).toNotExist();
-//             done();
-//           }).catch((e) => done(e));
-//         });
-//     });
-  
-//     it('should return 404 if todo not found', (done) => {
-//       var hexId = new ObjectID().toHexString();
-  
-//       request(app)
-//         .delete(`/todos/${hexId}`)
-//         .expect(404)
-//         .end(done);
-//     });
-  
-//     it('should return 404 if object id is invalid', (done) => {
-//       request(app)
-//         .delete('/todos/123abc')
-//         .expect(404)
-//         .end(done);
-//     });
-//   });
-
-// describe('Get users/me', () => {
-//     it('Should return a user if authenticated')
-
-// });
 
 
+describe('Get users/me', () => {
+    it('Should return a user if authenticated', (done) => {
+        request(app)
+        .get('/users/me')
+        .set('x-auth', users[0].tokens[0].token)
+        .expect(200)
+        .expect ( (res)=> {
+            expect(res.body._id).toBe(users[0]._id.toHexString());
+            expect(res.body.email).toBe(users[0].email);
+        })
+        .end(done);
+    });
+
+    it('Should return a 401 user if not authenticated authenticated', (done) => {
+        request(app)
+        .get('/users/me')
+//        .set('x-auth', users[1].tokens[0].token)
+        .expect(401)
+        .end(done);  
+    });
+});
+
+describe('Post users', () => {
+    var email ='mytestemail@one.com';
+    var password = 'abcttrt!';
+
+    it('Should create a user', (done) => {
+        request(app)
+        .post('/users')
+        .send ({email, password})
+        .expect(200)
+        .expect( (res)=> {
+            expect(res.headers['x-auth']).toExist();
+            expect(res.body.email).toBe(email);
+            expect(res.body._id).toExist();
+        })
+        .end((err)=> {
+            if (err) {
+                return done(err);
+            }
+ 
+        User.findOne({email}).then((user)=> {
+            expect(user).toExist();
+            expect(user.email).toBe(email);
+            done();
+            });
+        });
+    });
+
+    it('Should return validation errors if request invalid', (done) => {
+        var existEmail = 'boboneone.com';
+        request(app)
+        .post('/users')
+        .send({email: existEmail, password: password})
+        .expect(400)
+        .expect((res)=> {
+            expect(res.body._id).toNotExist();
+        //    console.log(res.body._id);
+        })
+        .end(done);
+       
+        
+    });
+
+    it('Should not create a user if email in use', (done) => {
+        var existEmail = 'bobone@one.com';
+        request(app)
+        .post('/users')
+        .send({email: existEmail, password: password})
+        .expect(400)
+        .expect((res)=> {
+            expect(res.body._id).toNotExist();
+        //    console.log(res.body._id);
+        })
+        .end(done);
+
+
+
+
+    });
+
+
+});
