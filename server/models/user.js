@@ -46,15 +46,13 @@ UserSchema.methods.toJSON = function() {
 
 };
 
-UserSchema.methods.generateAuthToken = function () {
+UserSchema.methods.generateAuthToken = function (id) {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({
-        _id: user._id.toHexString(),
-        access: access
-    }, 'saltSecret').toString();
-
-    user.tokens.push({access: access, token: token});
+    var token = jwt.sign({ _id: id, access: 'auth'}, 'saltSecret').toString();
+    console.log('In generateAuthToken ', user._id.toHexString());
+    console.log('In push ', token);
+    user.tokens.push({access, token});
 
 };
 
@@ -82,6 +80,28 @@ UserSchema.statics.findByToken = function(token){
         'tokens.access': 'auth'
         });
 };
+
+UserSchema.statics.findByCredentials = function(email, password){
+    // the "this" object is the model User
+    var User = this;
+    // returning a promise that can be rejected or chained to a then
+    return User.findOne({email}).then((user)=> {
+        if (!user) {
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject)=> {
+            bcrypt.compare(password, user.password).then((res)=> {
+                if (res) {
+                    resolve(user);
+                }
+                else {
+                    reject();
+                }
+            });
+        });
+    });
+
+}
 
 UserSchema.pre('save', function(next) {
     // not sure why in this case the this is the instance and not the Schema

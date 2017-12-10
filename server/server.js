@@ -3,6 +3,7 @@ require('./config/config');
 const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
+//const bcrypt = require('bcryptjs');
 
 var {mongoose} = require('./db/mongoose'); 
 const {ObjectID} = require('mongodb');
@@ -142,21 +143,11 @@ app.delete('/todos/:id', (req,res) => {
 app.post('/users', (req, res) => {
     //console.log(req.body);
     var body = _.pick(req.body, ["email", "password"]);
-    //console.log(body);
-    
-    // Method below is easier
-    // var user = new User({
-    //     email: body.email,
-    //     password: body.password
-    // });
-  
     var user = new User(body);
-    user.generateAuthToken();
+    user.generateAuthToken(user._id);
     //console.log(user);
     var token = _.find(user.tokens, { access: 'auth'}).token;
-    //var token = user.tokens[0].token;
-    //console.log('Token ', token);
-
+  
     user.save().then(
         (doc) => 
         {
@@ -184,6 +175,24 @@ app.post('/users', (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
        res.send(req.user);
 });
+
+
+app.post('/users/login', (req, res)=> {
+    var body = _.pick(req.body, ["email", "password"]);
+    console.log('Email ', body.email);
+    //res.send(body);
+    User.findByCredentials(body.email, body.password).then((user)=> {
+        user.generateAuthToken(user._id);
+
+        res.header('x-auth', user.tokens[0].token).send(user);
+    }).catch((error)=>{
+        res
+        .status(400)
+        .send();
+    });
+    
+});
+
 
 app.listen(port, () => {
     console.log(`Server started in port ${port}`);
