@@ -14,9 +14,8 @@ const users = [{
     password: 'userOnePass',
     tokens : [{
         access: 'auth',
-        token: jwt.sign({ _id: userOneId.toHexString(), access: 'auth'}, 'saltSecret').toString(),
-        _id: userOneId}
-    ]
+        token: jwt.sign({ _id: userOneId.toHexString(), access: 'auth'}, 'saltSecret').toString()
+        }]
 }, {
     _id: userTwoId,
     email: 'bobtwo@two.com',

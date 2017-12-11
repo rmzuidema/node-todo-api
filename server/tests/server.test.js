@@ -162,7 +162,7 @@ describe('Post users', () => {
             expect(user).toExist();
             expect(user.email).toBe(email);
             done();
-            });
+            }).catch((e) => done(e));
         });
     });
 
@@ -192,11 +192,46 @@ describe('Post users', () => {
         //    console.log(res.body._id);
         })
         .end(done);
-
-
-
-
     });
 
 
 });
+
+describe('Post users/login', () => {
+    
+        var email = users[0].email;
+        var password = users[0].password;
+    
+        it('Should login a user', (done) => {
+            request(app)
+            .post('/users/login')
+            .send({email: email, password: password})
+            .expect(200)
+            .expect( (res) => {
+                expect(res.headers['x-auth']).toExist();
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+    
+                User.findById(users[0]._id).then((user) => {
+                    console.log('Login token ', user.tokens[0]);
+                    expect(user.tokens[0]).toInclude({access: 'auth', token: res.headers['x-auth'] });
+                    done();
+                }).catch((e) => done(e));
+    
+        });
+    });
+
+    it('Should reject invalid login', (done) => {
+        request(app)
+        .post('/users/login')
+        .send({email: email, password: 'abc123'})
+        .expect(400)
+        .end(done);
+    });
+
+ 
+});
+
