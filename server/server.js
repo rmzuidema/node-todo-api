@@ -19,10 +19,11 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
 
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
     //console.log(req.body);
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
     todo.save().then(
         (doc) => 
@@ -35,22 +36,25 @@ app.post('/todos', (req, res) => {
         });
 });
 
-app.get('/todos', (req,res) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req,res) => {
+    Todo.find({_creator: req.user._id }).then((todos) => {
         res.send({todos: todos});
     },(error)=>{
         res.status(400).send(error);
     });
 });
 
-app.get('/todos/:id', (req,res) => {
+app.get('/todos/:id', authenticate, (req,res) => {
  //   res.send(req.params);
     var id = req.params.id;
     if (!ObjectID.isValid(id)) {
         //console.log('In obj id failed');
         return res.status(404).send();
     }
-    Todo.findById(id).then((todos) => {
+    Todo.findOne({
+        _id: id,
+        _creator: req.user._id
+    }).then((todos) => {
         if(todos){
             //console.log('In found');
             return res.send({todos: todos});
@@ -86,19 +90,22 @@ app.get('/todos/:id', (req,res) => {
 //        });
 //    });
 
-app.delete('/todos/:id', (req,res) => {
+app.delete('/todos/:id', authenticate, (req,res) => {
        var id = req.params.id;
        if (!ObjectID.isValid(id)) {
-           console.log('In obj id failed', id);
+           //console.log('In obj id failed', id);
            return res.status(404).send();
        }
-       Todo.findByIdAndRemove(id).then( (todo) => {
+       Todo.findOneAndRemove({
+           _id: id,
+           _creator: req.user._id
+       }).then( (todo) => {
            if(todo){
-               console.log('In found');
+               //console.log('In found');
                return res.send({todo: todo});
            }
            else {
-               console.log('In not found');
+               //console.log('In not found');
                return res.status(404).send({todos: todo});
            }
        }).catch( (error) => {
@@ -109,7 +116,7 @@ app.delete('/todos/:id', (req,res) => {
    });
 
 
-   app.patch('/todos/:id', (req,res) => {
+   app.patch('/todos/:id', authenticate, (req,res) => {
     var id = req.params.id;
     if (!ObjectID.isValid(id)) {
         //console.log('In obj id failed');
@@ -126,15 +133,19 @@ app.delete('/todos/:id', (req,res) => {
         body.completed = false;
         body.completedAt = null;
     }
-
-    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    //console.log("_id ", id);
+    //console.log("_creator ", req.user._id);
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id
+        }, {$set: body}, {new: true}).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         }
         res.send({todo});
 
     }).catch((err) => {
-        return res.status(400).send();
+        return res.status(400).send(err);
     });
 
 });
@@ -179,7 +190,7 @@ app.get('/users/me', authenticate, (req, res) => {
 
 app.post('/users/login', (req, res)=> {
     var body = _.pick(req.body, ["email", "password"]);
-    console.log('Email ', body.email);
+    //console.log('Email ', body.email);
     //res.send(body);
     User.findByCredentials(body.email, body.password).then((user)=> {
         user.generateAuthToken(user._id);

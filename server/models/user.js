@@ -48,8 +48,8 @@ UserSchema.methods.generateAuthToken = function (id) {
     var user = this;
     var access = 'auth';
     var token = jwt.sign({ _id: id, access: 'auth'}, 'saltSecret').toString();
-    console.log('In generateAuthToken ', user._id.toHexString());
-    console.log('In push ', token);
+    //console.log('In generateAuthToken ', user._id.toHexString());
+    //console.log('In push ', token);
     user.tokens.push({access, token});
 
 };
