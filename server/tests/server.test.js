@@ -158,7 +158,7 @@ describe('Post users', () => {
                 return done(err);
             }
  
-        User.findOne({email}).then((user)=> {
+        User.findOne( {email}).then((user)=> {
             expect(user).toExist();
             expect(user.email).toBe(email);
             done();
@@ -233,5 +233,30 @@ describe('Post users/login', () => {
     });
 
  
+});
+
+describe('Delete /users/me/token', () => {
+    
+    var email = users[0].email;
+    var password = users[0].password;
+    var token = users[0].tokens[0].token;
+
+    it('Should remove token', (done) => {
+        request(app)
+        .delete('/users/me/token')
+        .set('x-auth', token)
+        .send()
+        .expect(200)
+        .end((error) =>{
+            if (error) {
+                return done(error);
+            }
+            User.findOne({ email }).then((user) => {
+                expect(user.tokens.length).toBe(0);
+                done();
+            }).catch((err) => done(err));
+        });
+    });
+
 });
 
