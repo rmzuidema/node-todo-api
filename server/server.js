@@ -194,6 +194,31 @@ app.post('/users/login', (req, res)=> {
 });
 
 
+app.delete('/users/me/token', authenticate, (req, res) => {
+    // if we get here the user is authnticated
+
+    // the req has the user
+    //        
+        // User.findByToken(token).then((user)=> {
+        // if (!user) {
+        //     return Promise.reject();
+        // }
+        // req.user = user;
+        // req.token= token;
+        // next();
+    // must then remove the token from the user
+    req.user.removeToken(req.token).then((user) => {
+        res.send(req.user);
+        
+    }).catch((error) => {
+        res
+        .status(400)
+        .send();
+    });
+
+ });
+
+
 app.listen(port, () => {
     console.log(`Server started in port ${port}`);
 });

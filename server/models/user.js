@@ -54,6 +54,17 @@ UserSchema.methods.generateAuthToken = function (id) {
 
 };
 
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+    return user.update({
+        $pull: {
+            tokens: {
+                token:token
+            }
+        }
+    });
+};
+
 
 // Create a static method
 // Will return a promise
@@ -64,7 +75,7 @@ UserSchema.statics.findByToken = function(token){
 
     try {
         decoded = jwt.verify(token, 'saltSecret');
-        console.log('Decoded ', decoded);
+        //console.log('Decoded ', decoded);
     } catch(e) {
         return new Promise((resolve, reject) => {
             // Failed so reject
