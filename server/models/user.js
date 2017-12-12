@@ -51,7 +51,10 @@ UserSchema.methods.generateAuthToken = function (id) {
     //console.log('In generateAuthToken ', user._id.toHexString());
     //console.log('In push ', token);
     user.tokens.push({access, token});
-
+    
+    return user.save().then(() => {
+        return token;
+      });
 };
 
 UserSchema.methods.removeToken = function (token) {
