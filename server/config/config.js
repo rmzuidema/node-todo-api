@@ -2,6 +2,7 @@
 // export the data to a ignored json file
 
 var env = process.env.NODE_ENV || 'Local';
+if (env === 'Local') {
 
     var config = require('./config.json');
     var envConfig = config[env];
@@ -12,7 +13,7 @@ var env = process.env.NODE_ENV || 'Local';
         process.env[key]=envConfig[key];
  //       console.log('Process env ', process.env[key]);
     });
-
+}
 // if ( env === 'Local') {
 //     process.env.MONGOURI='mongodb://localhost:27017/NewTodoApp';
 // } else {
