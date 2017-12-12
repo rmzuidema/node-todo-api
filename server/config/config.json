@@ -1,0 +1,12 @@
+{
+    "Local": {
+        "PORT" : "3000",
+        "MONGOURI": "mongodb://localhost:27017/NewTodoApp",
+        "JWT_SECRET": "ui86uywewyhsgd"
+    },
+    "Heroku": {
+        "PORT" : "3000",
+        "MONGOURI": "mongodb://todouser:todouser58@ds129966.mlab.com:29966/newtodoapp",
+        "JWT_SECRET": "ui86uywewyhsgd"
+    }
+}
