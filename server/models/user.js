@@ -47,7 +47,7 @@ UserSchema.methods.toJSON = function() {
 UserSchema.methods.generateAuthToken = function (id) {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({ _id: id, access: 'auth'}, 'saltSecret').toString();
+    var token = jwt.sign({ _id: id, access: 'auth'},  process.env.JWT_SECRET).toString();
     //console.log('In generateAuthToken ', user._id.toHexString());
     //console.log('In push ', token);
     user.tokens.push({access, token});
@@ -74,7 +74,7 @@ UserSchema.statics.findByToken = function(token){
     var decoded; // set to undefined
 
     try {
-        decoded = jwt.verify(token, 'saltSecret');
+        decoded = jwt.verify(token,  process.env.JWT_SECRET);
         //console.log('Decoded ', decoded);
     } catch(e) {
         return new Promise((resolve, reject) => {

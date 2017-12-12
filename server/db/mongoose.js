@@ -11,7 +11,7 @@ mongoose.Promise = global.Promise;
 //mongoose.connect('mongodb://localhost:27017/NewTodoApp',{ useMongoClient: true});
 
 var connectString = process.env.MONGOURI;
-//console.log('connectString ' , connectString);
+console.log('connectString ' , connectString);
 
 mongoose.connect(connectString,{ useMongoClient: true});
 
